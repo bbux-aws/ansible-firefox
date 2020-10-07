@@ -1,0 +1,7 @@
+.terraform
+*.tfstate*
+config/*.json
+.idea
+build_artifact.txt
+ansible.cfg
+*.swp

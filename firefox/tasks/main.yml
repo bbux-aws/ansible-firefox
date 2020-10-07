@@ -1,0 +1,5 @@
+---
+# tasks file for firefox
+
+- include: firefox_ubuntu.yml
+  when: os_type == 'ubuntu'
