@@ -5,4 +5,37 @@
   apt:
     update_cache: yes
     pkg:
-      - git
+      - firefox
+
+- name: Check profile exists
+  command: grep -s "Name={{ default_profile_name }}" ~/.mozilla/firefox/profiles.ini
+  register: grep_profile
+  changed_when: false
+  failed_when: grep_profile.rc > 2
+
+- name: Initialize Firefox Fist time
+  shell: "firefox --headless -no-remote -CreateProfile {{ default_profile_name }}"
+  when: grep_profile.rc != 0
+
+- name: Locate Mozilla Dir
+  find:
+    paths: /home/ubuntu/.mozilla/firefox
+    patterns: "*.{{ default_profile_name }}"
+    file_type: directory
+  register: firefox_dir
+
+# uses vars defined in firefox.prefs to populate template
+- name: Copy User Preferences
+  template:
+    src: ../templates/user.js.tpl
+    dest: "{{ firefox_dir.files[0].path }}/user.js"
+
+- name: Check Alias exists
+  command: grep -s "alias firefox" ~/.bashrc
+  register: grep_alias
+  changed_when: false
+  failed_when: grep_alias.rc > 2
+
+- name: Add firefox alias for profile
+  shell: "echo 'alias firefox=\"firefox -P {{ default_profile_name }}\"' >> ~/.bash_aliases"
+  when: grep_alias.rc != 0

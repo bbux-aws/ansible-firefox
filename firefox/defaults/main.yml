@@ -1,3 +1,4 @@
 ---
 # defaults file for firefox
 os_type: 'ubuntu'
+default_profile_name: 'default'
